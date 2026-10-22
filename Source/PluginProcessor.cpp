@@ -7,10 +7,9 @@ JunoCloneAudioProcessor::JunoCloneAudioProcessor()
     : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       apvts (*this, nullptr, "PARAMS", createLayout())
 {
-    // --- Schritt: Voice-Stealing ---
-    // Wenn alle Stimmen belegt sind, wird die aelteste/am wenigsten relevante
-    // Stimme "gestohlen", anstatt neue Noten zu ignorieren - Standardverhalten
-    // bei polyphonen Hardware- wie Software-Synths.
+    // --- Voice-Stealing ---
+    // Wenn alle Stimmen belegt sind, wird die aelteste Stimme "gestohlen",
+    // anstatt neue Noten zu ignorieren.
     synth.setNoteStealingEnabled (true);
 
     for (int i = 0; i < 8; ++i)
@@ -85,7 +84,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout JunoCloneAudioProcessor::cre
     p.push_back (std::make_unique<P> ("release",    "Release",   0.001f, 5.0f, 0.3f));
     p.push_back (std::make_unique<P> ("vcaGateMode","VCA Mode",  0.0f, 1.0f, 0.0f));
 
-    // --- Neue Parameter aus diesem Erweiterungsschritt ---
     p.push_back (std::make_unique<PC> ("chorusMode", "Chorus",
                     juce::StringArray { "Off", "I", "II", "I+II" }, 0));
     p.push_back (std::make_unique<PC> ("unisonVoices", "Unison Voices",
@@ -153,17 +151,24 @@ void JunoCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     if (oversampler == nullptr)
         return;
 
-    auto block = juce::dsp::AudioBlock<float> (buffer);
+    // "Normaler" (nicht oversampelter) Block, der direkt auf den Original-Puffer zeigt.
+    juce::dsp::AudioBlock<float> originalBlock (buffer);
 
-    size_t numOS = (size_t) buffer.getNumSamples() * (size_t) currentOversamplingFactor;
-    auto osBlockFull = oversampler->getOversampledBuffer();
-    auto osBlock = osBlockFull.getSubBlock (0, numOS);
+    // Oversampling nach oben: liefert einen Block mit erhoehter Samplerate,
+    // dessen Speicher intern vom Oversampling-Objekt verwaltet wird.
+    auto osBlock = oversampler->processSamplesUp (originalBlock);
+    const int numOS = (int) osBlock.getNumSamples();
 
-    float* chans[2];
-    chans[0] = osBlock.getChannelPointer (0);
-    chans[1] = osBlock.getNumChannels() > 1 ? osBlock.getChannelPointer (1) : osBlock.getChannelPointer (0);
+    // synth.renderNextBlock() erwartet einen "echten" AudioBuffer<float>, keinen
+    // dsp::AudioBlock - wir bauen daher einen Nicht-Besitz-Wrapper um die
+    // Kanalzeiger des Oversampling-Blocks, damit die Stimmen direkt in diesen
+    // Speicher hineinschreiben.
+    float* channelPointers[2];
+    channelPointers[0] = osBlock.getChannelPointer (0);
+    channelPointers[1] = osBlock.getNumChannels() > 1 ? osBlock.getChannelPointer (1)
+                                                       : osBlock.getChannelPointer (0);
 
-    juce::AudioBuffer<float> osBuffer (chans, (int) osBlock.getNumChannels(), (int) numOS);
+    juce::AudioBuffer<float> osBuffer (channelPointers, (int) osBlock.getNumChannels(), numOS);
     osBuffer.clear();
 
     juce::MidiBuffer scaledMidi;
@@ -171,10 +176,11 @@ void JunoCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     chorus.setMode (chorusModeParam != nullptr ? (int) chorusModeParam->load() : 0);
 
-    synth.renderNextBlock (osBuffer, scaledMidi, 0, (int) numOS);
+    synth.renderNextBlock (osBuffer, scaledMidi, 0, numOS);
     chorus.process (osBlock);
 
-    oversampler->processSamplesDown (block);
+    // Oversampling nach unten: schreibt das fertige Ergebnis direkt zurueck in "buffer".
+    oversampler->processSamplesDown (originalBlock);
 }
 
 void JunoCloneAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
