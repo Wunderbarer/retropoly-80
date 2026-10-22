@@ -25,10 +25,13 @@ jobs:
         run: choco install innosetup -y
 
       - name: Installer bauen
-        run: '"C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe" installer\\installer.iss'
+        shell: cmd
+        run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\installer.iss'
 
       - name: Setup.exe als Download bereitstellen
         uses: actions/upload-artifact@v4
         with:
           name: RetroPoly-80-Installer
-          path: installer\\Output\\RetroPoly-80_Setup.exe
+          path: installer\Output\RetroPoly-80_Setup.exe
+
+
