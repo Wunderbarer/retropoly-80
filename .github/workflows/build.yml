@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Repository auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: JUCE herunterladen
         run: git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git JUCE
@@ -29,9 +29,7 @@ jobs:
         run: '"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\installer.iss'
 
       - name: Setup.exe als Download bereitstellen
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: RetroPoly-80-Installer
           path: installer\Output\RetroPoly-80_Setup.exe
-
-
