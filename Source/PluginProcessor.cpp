@@ -14,9 +14,7 @@ JunoCloneAudioProcessor::JunoCloneAudioProcessor()
     synth.setNoteStealingEnabled (true);
 
     // --- Schritt: Polyphonie erhoeht ---
-    // 16 statt vormals 8 gleichzeitige Stimmen. Durch das weiterhin aktive
-    // Voice-Stealing (siehe oben) bleibt das Verhalten bei noch mehr
-    // gleichzeitig gehaltenen Noten weiterhin robust.
+    // 16 statt vormals 8 gleichzeitige Stimmen.
     for (int i = 0; i < 16; ++i)
         synth.addVoice (new JunoVoice (voiceParams));
     synth.addSound (new JunoSound());
@@ -159,15 +157,21 @@ void JunoCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     auto block = juce::dsp::AudioBlock<float> (buffer);
 
-    size_t numOS = (size_t) buffer.getNumSamples() * (size_t) currentOversamplingFactor;
-    auto osBlockFull = oversampler->getOversampledBuffer();
-    auto osBlock = osBlockFull.getSubBlock (0, numOS);
+    // --- Fix: korrekte Oversampling-API verwenden ---
+    // juce::dsp::Oversampling kennt keine Methode "getOversampledBuffer()".
+    // Richtig ist: processSamplesUp() liefert einen AudioBlock, der auf den
+    // internen (hochgerechneten) Arbeitspuffer zeigt. Da "buffer" an dieser
+    // Stelle noch leer ist (der Klang wird gleich erst vom Synth erzeugt),
+    // dient der Aufruf hier nur dazu, einen korrekt dimensionierten
+    // Scratch-Block in der (ggf. erhoehten) internen Samplerate zu bekommen.
+    auto osBlock = oversampler->processSamplesUp (block);
+    auto numOS = (int) osBlock.getNumSamples();
 
     float* chans[2];
     chans[0] = osBlock.getChannelPointer (0);
     chans[1] = osBlock.getNumChannels() > 1 ? osBlock.getChannelPointer (1) : osBlock.getChannelPointer (0);
 
-    juce::AudioBuffer<float> osBuffer (chans, (int) osBlock.getNumChannels(), (int) numOS);
+    juce::AudioBuffer<float> osBuffer (chans, (int) osBlock.getNumChannels(), numOS);
     osBuffer.clear();
 
     juce::MidiBuffer scaledMidi;
@@ -175,9 +179,10 @@ void JunoCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     chorus.setMode (chorusModeParam != nullptr ? (int) chorusModeParam->load() : 0);
 
-    synth.renderNextBlock (osBuffer, scaledMidi, 0, (int) numOS);
+    synth.renderNextBlock (osBuffer, scaledMidi, 0, numOS);
     chorus.process (osBlock);
 
+    // Downsampling direkt zurueck auf Host-Samplerate in "buffer".
     oversampler->processSamplesDown (block);
 }
 

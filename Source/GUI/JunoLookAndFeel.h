@@ -35,16 +35,8 @@ public:
         auto angle = startAngle + pos * (endAngle - startAngle);
 
         // --- Schritt: garantiert kreisrunde Potis ---
-        // Zuvor wurde die komplette (ggf. rechteckige/ovale) Slider-Flaeche
-        // "bounds" direkt mit fillEllipse() gefuellt. Liegt ein Regler in
-        // einem nicht-quadratischen Layout-Feld, entsteht dadurch ein Oval
-        // statt eines Kreises. Jetzt wird stattdessen ein exakt quadratisches,
-        // um den Mittelpunkt zentriertes Feld mit Seitenlaenge 2*radius
-        // verwendet - das Ergebnis ist unter allen Layout-Bedingungen ein
-        // echter Kreis.
         auto circleBounds = juce::Rectangle<float> (radius * 2.0f, radius * 2.0f).withCentre (centre);
 
-        // Poti-Koerper mit leichtem Radial-Verlauf, wirkt wie gebuerstetes Metall/Kunststoff
         juce::ColourGradient grad (juce::Colour (0xff4a4a4e), centre.x, centre.y - radius,
                                     juce::Colour (0xff1c1c1e), centre.x, centre.y + radius, false);
         g.setGradientFill (grad);
@@ -52,7 +44,6 @@ public:
         g.setColour (juce::Colours::black);
         g.drawEllipse (circleBounds, 1.5f);
 
-        // Skalenstriche wie beim Original (11 Raststriche: min, 9 Zwischenwerte, max)
         g.setColour (juce::Colours::grey);
         for (int i = 0; i <= 10; ++i)
         {
@@ -63,10 +54,6 @@ public:
         }
 
         // --- Schritt: laengerer Zeiger ---
-        // Zeigerlaenge von vormals 75% auf 92% des Radius erhoeht (reicht nun
-        // fast bis an den Rand des Potis) und etwas dicker gezeichnet, damit
-        // die aktuelle Reglerstellung auch bei kleineren Reglergroessen auf
-        // den ersten Blick gut ablesbar ist.
         juce::Point<float> tip (centre.x + radius * 0.92f * std::cos (angle - juce::MathConstants<float>::halfPi),
                                  centre.y + radius * 0.92f * std::sin (angle - juce::MathConstants<float>::halfPi));
         g.setColour (accentColour);
