@@ -12,7 +12,8 @@ public:
 
     void paint (juce::Graphics& g) override
     {
-        const int numLeds = 8;
+        // --- Schritt: Polyphonie erhoeht --- (zeigt jetzt alle 16 Stimmen)
+        const int numLeds = juce::jmax (1, proc.getTotalVoiceCount());
         auto bounds = getLocalBounds().toFloat();
         float ledSize = juce::jmin (bounds.getHeight(), bounds.getWidth() / (float) numLeds) * 0.8f;
         float spacing = bounds.getWidth() / (float) numLeds;

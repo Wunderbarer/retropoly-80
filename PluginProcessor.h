@@ -48,6 +48,9 @@ public:
         return count;
     }
 
+    // --- Schritt: Polyphonie erhoeht ---
+    int getTotalVoiceCount() const { return synth.getNumVoices(); }
+
     juce::AudioProcessorValueTreeState apvts;
     PresetManager presetManager { apvts };
 
