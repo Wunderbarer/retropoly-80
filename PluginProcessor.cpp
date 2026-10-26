@@ -9,9 +9,7 @@ JunoCloneAudioProcessor::JunoCloneAudioProcessor()
 {
     synth.setNoteStealingEnabled (true);
 
-    // --- Schritt: Polyphonie erhoeht ---
-    // 16 statt vormals 8 gleichzeitige Stimmen.
-    for (int i = 0; i < 16; ++i)
+    for (int i = 0; i < 8; ++i)
         synth.addVoice (new JunoVoice (voiceParams));
     synth.addSound (new JunoSound());
 

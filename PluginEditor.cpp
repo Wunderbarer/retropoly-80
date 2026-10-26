@@ -130,7 +130,7 @@ JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addKnob (
     c->slider = std::make_unique<juce::Slider> (juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox);
     c->label.setText (text, juce::dontSendNotification);
     c->label.setJustificationType (juce::Justification::centred);
-    c->label.setFont (juce::Font (13.5f, juce::Font::bold));
+    c->label.setFont (juce::Font (10.5f));
     addAndMakeVisible (*c->slider);
     addAndMakeVisible (c->label);
     c->sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc.apvts, paramId, *c->slider);
@@ -151,7 +151,7 @@ JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addCombo 
     }
     c->label.setText (text, juce::dontSendNotification);
     c->label.setJustificationType (juce::Justification::centred);
-    c->label.setFont (juce::Font (13.5f, juce::Font::bold));
+    c->label.setFont (juce::Font (10.5f));
     addAndMakeVisible (*c->combo);
     addAndMakeVisible (c->label);
     c->comboAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc.apvts, paramId, *c->combo);
@@ -167,7 +167,7 @@ JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addToggle
     c->toggle->setClickingTogglesState (true);
     c->label.setText (text, juce::dontSendNotification);
     c->label.setJustificationType (juce::Justification::centred);
-    c->label.setFont (juce::Font (13.5f, juce::Font::bold));
+    c->label.setFont (juce::Font (10.5f));
     addAndMakeVisible (*c->toggle);
     addAndMakeVisible (c->label);
     c->buttonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (proc.apvts, paramId, *c->toggle);
@@ -207,7 +207,7 @@ void JunoCloneAudioProcessorEditor::layoutRow (const std::vector<Section*>& rowS
         int cx = inner.getX();
         for (auto* ctrl : sec.controls)
         {
-            auto cBounds = juce::Rectangle<int> (cx, inner.getY(), controlW - 4, inner.getHeight() - 22);
+            auto cBounds = juce::Rectangle<int> (cx, inner.getY(), controlW - 4, inner.getHeight() - 16);
             if (ctrl->combo != nullptr)
             {
                 ctrl->combo->setBounds (cBounds.removeFromTop (24).withSizeKeepingCentre (controlW - 8, 22));
@@ -220,7 +220,7 @@ void JunoCloneAudioProcessorEditor::layoutRow (const std::vector<Section*>& rowS
             {
                 ctrl->slider->setBounds (cBounds);
             }
-            ctrl->label.setBounds (cx, inner.getBottom() - 20, controlW - 4, 20);
+            ctrl->label.setBounds (cx, inner.getBottom() - 14, controlW - 4, 14);
             cx += controlW;
         }
         x += sectionWidth;

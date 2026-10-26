@@ -33,11 +33,8 @@ public:
         auto centre = bounds.getCentre();
         auto angle = startAngle + pos * (endAngle - startAngle);
 
-        // --- Schritt: garantiert kreisrunde Potis ---
-        auto circleBounds = juce::Rectangle<float> (radius * 2.0f, radius * 2.0f).withCentre (centre);
-
         g.setColour (juce::Colour (0xff10151c));
-        g.fillEllipse (circleBounds);
+        g.fillEllipse (bounds);
 
         g.setColour (juce::Colours::white.withAlpha (0.7f));
         for (int i = 0; i <= 10; ++i)
@@ -48,7 +45,7 @@ public:
             g.drawLine ({ p1, p2 }, 1.2f);
         }
 
-        auto capBounds = circleBounds.reduced (radius * 0.22f);
+        auto capBounds = bounds.reduced (radius * 0.22f);
         juce::ColourGradient grad (juce::Colour (0xfffafaf6), centre.x, centre.y - radius,
                                     juce::Colour (0xffd6d6cd), centre.x, centre.y + radius, false);
         g.setGradientFill (grad);
@@ -56,12 +53,11 @@ public:
         g.setColour (juce::Colours::black.withAlpha (0.35f));
         g.drawEllipse (capBounds, 1.0f);
 
-        // --- Schritt: deutlich laengerer, dickerer Zeiger ---
         auto capRadius = capBounds.getWidth() * 0.5f;
-        juce::Point<float> tip (centre.x + capRadius * 0.94f * std::cos (angle - juce::MathConstants<float>::halfPi),
-                                 centre.y + capRadius * 0.94f * std::sin (angle - juce::MathConstants<float>::halfPi));
+        juce::Point<float> tip (centre.x + capRadius * 0.78f * std::cos (angle - juce::MathConstants<float>::halfPi),
+                                 centre.y + capRadius * 0.78f * std::sin (angle - juce::MathConstants<float>::halfPi));
         g.setColour (juce::Colours::black);
-        g.drawLine ({ centre, tip }, 3.4f);
+        g.drawLine ({ centre, tip }, 2.8f);
     }
 
     void drawToggleButton (juce::Graphics& g, juce::ToggleButton& button,
@@ -78,7 +74,7 @@ public:
         g.fillEllipse (led);
 
         g.setColour (juce::Colours::white);
-        g.setFont (juce::Font (13.5f));
+        g.setFont (juce::Font (12.0f));
         g.drawText (button.getButtonText(), bounds.withTrimmedLeft (20.0f), juce::Justification::centredLeft);
         juce::ignoreUnused (shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
     }
@@ -108,8 +104,8 @@ public:
         g.drawRoundedRectangle (bounds, 5.0f, 1.0f);
 
         g.setColour (accentColour);
-        g.setFont (juce::Font (14.5f, juce::Font::bold));
-        g.drawText (text.toUpperCase(), bounds.removeFromTop (19.0f).reduced (6.0f, 0.0f),
+        g.setFont (juce::Font (12.5f, juce::Font::bold));
+        g.drawText (text.toUpperCase(), bounds.removeFromTop (16.0f).reduced (6.0f, 0.0f),
                     juce::Justification::centredLeft);
     }
 
