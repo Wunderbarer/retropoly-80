@@ -3,7 +3,6 @@
 #include <juce_dsp/juce_dsp.h>
 #include "DSP/UnisonSynthesiser.h"
 #include "DSP/JunoChorus.h"
-#include "DSP/JunoDelay.h"
 #include "Presets/PresetManager.h"
 
 class JunoCloneAudioProcessor : public juce::AudioProcessor,
@@ -39,15 +38,6 @@ public:
         return layouts.getMainOutputChannelSet() == juce::AudioChannelSet::stereo();
     }
 
-    int getActiveVoiceCount()
-    {
-        int count = 0;
-        for (int i = 0; i < synth.getNumVoices(); ++i)
-            if (synth.getVoice (i)->isVoiceActive())
-                ++count;
-        return count;
-    }
-
     juce::AudioProcessorValueTreeState apvts;
     PresetManager presetManager { apvts };
 
@@ -60,22 +50,21 @@ private:
     UnisonSynthesiser synth;
     JunoParams voiceParams;
     JunoChorus chorus;
-    JunoDelay delay;
 
+    // --- Schritt: Oversampling ---
+    // Die komplette Stimmen-Synthese (DCO + Filter) wird intern bei hoeherer
+    // Samplerate gerendert ("Quality: High") und danach mit einem sauberen
+    // Halbband-Filter wieder auf die Host-Samplerate heruntergerechnet. Das
+    // reduziert Aliasing-Artefakte, besonders bei hoher Filter-Resonanz.
     std::unique_ptr<juce::dsp::Oversampling<float>> oversampler;
+    juce::AudioBuffer<float> midiScratchUnused; // reserviert
     int currentOversamplingFactor = 1;
     double hostSampleRate = 44100.0;
     int hostBlockSize = 512;
     std::atomic<bool> oversamplingDirty { true };
 
-    std::atomic<float>* oversamplingParam   = nullptr;
-    std::atomic<float>* chorusRateParam     = nullptr;
-    std::atomic<float>* chorusDepthParam    = nullptr;
-    std::atomic<float>* chorusMixParam      = nullptr;
-    std::atomic<float>* delayTimeParam      = nullptr;
-    std::atomic<float>* delayFeedbackParam  = nullptr;
-    std::atomic<float>* delayMixParam       = nullptr;
-    std::atomic<float>* masterVolumeParam   = nullptr;
+    std::atomic<float>* chorusModeParam = nullptr;
+    std::atomic<float>* oversamplingParam = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JunoCloneAudioProcessor)
 };

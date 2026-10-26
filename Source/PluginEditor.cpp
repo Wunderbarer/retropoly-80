@@ -5,119 +5,53 @@ JunoCloneAudioProcessorEditor::JunoCloneAudioProcessorEditor (JunoCloneAudioProc
 {
     setLookAndFeel (&lnf);
     addAndMakeVisible (presetBar);
-    addAndMakeVisible (voiceLedBar);
 
-    auto& lfo1Sec = addSection ("LFO 1", 0);
-    addCombo (lfo1Sec, "lfo1Wave", "Wave");
-    addKnob  (lfo1Sec, "lfo1Rate", "Rate");
+    auto& lfoSec   = addSection ("LFO");
+    addFader (lfoSec, "lfoRate",  "Rate");
+    addFader (lfoSec, "lfoDelay", "Delay");
+    addKnob  (lfoSec, "lfoToDco", "DCO Mod");
+    addKnob  (lfoSec, "lfoToVcf", "VCF Mod");
 
-    auto& lfo2Sec = addSection ("LFO 2", 0);
-    addCombo (lfo2Sec, "lfo2Wave", "Wave");
-    addKnob  (lfo2Sec, "lfo2Rate", "Rate");
+    auto& dcoSec = addSection ("DCO");
+    addKnob (dcoSec, "sawLevel",     "Saw");
+    addKnob (dcoSec, "pulseLevel",   "Pulse");
+    addKnob (dcoSec, "subLevel",     "Sub");
+    addKnob (dcoSec, "noiseLevel",   "Noise");
+    addKnob (dcoSec, "pwmAmount",    "PWM");
+    addKnob (dcoSec, "pwmLfoAmount", "PWM LFO");
 
-    auto& lfo3Sec = addSection ("LFO 3 (Vibrato)", 0);
-    addKnob (lfo3Sec, "lfo3Rate", "Rate");
-    addKnob (lfo3Sec, "lfo3ModWheelAmount", "ModWheel");
+    auto& hpfSec = addSection ("HPF");
+    addKnob (hpfSec, "hpfStep", "Cutoff");
 
-    auto& osc1Sec = addSection ("OSC 1", 0);
-    addCombo (osc1Sec, "osc1Wave", "Wave");
-    addKnob  (osc1Sec, "osc1Tune", "Tune");
-    addKnob  (osc1Sec, "osc1Lfo1Mod", "LFO1 Mod");
-    addKnob  (osc1Sec, "osc1Lfo2Mod", "LFO2 Mod");
-    addKnob  (osc1Sec, "osc1Eg1Pwm", "EG1 PWM");
-    addKnob  (osc1Sec, "osc1Lfo1Pwm", "LFO1 PWM");
+    auto& vcfSec = addSection ("VCF");
+    addKnob (vcfSec, "vcfCutoff",    "Cutoff");
+    addKnob (vcfSec, "vcfResonance", "Reso");
+    addKnob (vcfSec, "vcfEnvAmount", "Env Amt");
+    addKnob (vcfSec, "vcfKeyFollow", "Kybd");
 
-    auto& osc2Sec = addSection ("OSC 2", 0);
-    addCombo  (osc2Sec, "osc2Wave", "Wave");
-    addKnob   (osc2Sec, "osc2Tune", "Tune");
-    addKnob   (osc2Sec, "osc2Lfo1Mod", "LFO1 Mod");
-    addKnob   (osc2Sec, "osc2Lfo2Mod", "LFO2 Mod");
-    addKnob   (osc2Sec, "osc2Eg1Pwm", "EG1 PWM");
-    addKnob   (osc2Sec, "osc2Lfo1Pwm", "LFO1 PWM");
-    addToggle (osc2Sec, "osc2Sync", "Sync");
+    auto& envSec = addSection ("ENV / VCA");
+    addFader (envSec, "attack",  "A");
+    addFader (envSec, "decay",   "D");
+    addFader (envSec, "sustain", "S");
+    addFader (envSec, "release", "R");
+    addCombo (envSec, "vcaGateMode", "Mode");
 
-    auto& mixSec = addSection ("Mixer", 0);
-    addKnob (mixSec, "mixOsc1", "OSC1");
-    addKnob (mixSec, "mixSub1", "Sub1");
-    addKnob (mixSec, "mixOsc2", "OSC2");
-    addKnob (mixSec, "mixSub2", "Sub2");
-    addKnob (mixSec, "mixNoise", "Noise");
+    auto& fxSec = addSection ("Chorus / Unisono");
+    addCombo (fxSec, "chorusMode",    "Chorus");
+    addCombo (fxSec, "unisonVoices",  "Voices");
+    addKnob  (fxSec, "unisonDetune",  "Detune");
+    addKnob  (fxSec, "glideTime",     "Glide");
+    addCombo (fxSec, "oversampling",  "Quality");
 
-    auto& modeSec = addSection ("Mode", 0);
-    addCombo (modeSec, "unisonVoices", "Voices");
-    addKnob  (modeSec, "unisonDetune", "Detune");
-    addKnob  (modeSec, "glideTime", "Portamento");
-
-    auto& filterSec = addSection ("Filter", 1);
-    addKnob (filterSec, "hpfStep", "HPF");
-    addKnob (filterSec, "vcfCutoff", "Cutoff");
-    addKnob (filterSec, "vcfResonance", "Reso");
-    addKnob (filterSec, "vcfKeyFollow", "Kybd");
-    addKnob (filterSec, "vcfEg1Mod", "EG1 Mod");
-    addKnob (filterSec, "vcfLfo1Mod", "LFO1 Mod");
-    addKnob (filterSec, "vcfLfo2Mod", "LFO2 Mod");
-
-    auto& ampSec = addSection ("Amplifier", 1);
-    addKnob  (ampSec, "ampLfo1Mod", "LFO1 Mod");
-    addKnob  (ampSec, "ampLfo2Mod", "LFO2 Mod");
-    addKnob  (ampSec, "ampKeyTrack", "Kybd Trk");
-    addKnob  (ampSec, "ampVelocityMod", "Vel Mod");
-    addCombo (ampSec, "vcaGateMode", "Mode");
-
-    auto& eg1Sec = addSection ("Envelope 1 (Filter)", 1);
-    addKnob (eg1Sec, "eg1Attack", "A");
-    addKnob (eg1Sec, "eg1Decay", "D");
-    addKnob (eg1Sec, "eg1Sustain", "S");
-    addKnob (eg1Sec, "eg1Release", "R");
-    addKnob (eg1Sec, "eg1VelocityMod", "Vel Mod");
-    addKnob (eg1Sec, "eg1KeyTrack", "Kybd Trk");
-
-    auto& eg2Sec = addSection ("Envelope 2 (Amp)", 1);
-    addKnob (eg2Sec, "eg2Attack", "A");
-    addKnob (eg2Sec, "eg2Decay", "D");
-    addKnob (eg2Sec, "eg2Sustain", "S");
-    addKnob (eg2Sec, "eg2Release", "R");
-    addKnob (eg2Sec, "eg2VelocityMod", "Vel Mod");
-    addKnob (eg2Sec, "eg2KeyTrack", "Kybd Trk");
-
-    auto& chorusSec = addSection ("Chorus", 1);
-    addKnob (chorusSec, "chorusRate", "Rate");
-    addKnob (chorusSec, "chorusDepth", "Depth");
-    addKnob (chorusSec, "chorusMix", "Mix");
-
-    auto& delaySec = addSection ("Delay", 1);
-    addKnob (delaySec, "delayTime", "Time");
-    addKnob (delaySec, "delayFeedback", "Feedback");
-    addKnob (delaySec, "delayMix", "Mix");
-
-    auto& outSec = addSection ("Output", 1);
-    addKnob  (outSec, "masterVolume", "Volume");
-    addCombo (outSec, "oversampling", "Quality");
-
-    addChildComponent (saveOverlay);
-    presetBar.onSaveRequested = [this] (const juce::String& currentName)
-    {
-        saveOverlay.show (currentName);
-    };
-    saveOverlay.onSave = [this] (const juce::String& newName)
-    {
-        proc.presetManager.savePresetAs (newName);
-        presetBar.refreshLabel();
-    };
-    saveOverlay.onCancel = [] {};
-
-    setResizable (true, true);
-    setResizeLimits (1100, 620, 2000, 1100);
-    setSize (1480, 760);
+    setSize (1040, 440);
 }
 
 JunoCloneAudioProcessorEditor::~JunoCloneAudioProcessorEditor() { setLookAndFeel (nullptr); }
 
-JunoCloneAudioProcessorEditor::Section& JunoCloneAudioProcessorEditor::addSection (const juce::String& title, int row)
+JunoCloneAudioProcessorEditor::Section& JunoCloneAudioProcessorEditor::addSection (const juce::String& title)
 {
     auto sec = std::make_unique<Section>();
     sec->title = title;
-    sec->row = row;
     sec->group.setText (title);
     addAndMakeVisible (sec->group);
     sections.push_back (std::move (sec));
@@ -130,7 +64,22 @@ JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addKnob (
     c->slider = std::make_unique<juce::Slider> (juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox);
     c->label.setText (text, juce::dontSendNotification);
     c->label.setJustificationType (juce::Justification::centred);
-    c->label.setFont (juce::Font (10.5f));
+    c->label.setFont (juce::Font (11.0f));
+    addAndMakeVisible (*c->slider);
+    addAndMakeVisible (c->label);
+    c->sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc.apvts, paramId, *c->slider);
+    sec.controls.push_back (c.get());
+    allControls.push_back (std::move (c));
+    return *allControls.back();
+}
+
+JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addFader (Section& sec, const juce::String& paramId, const juce::String& text)
+{
+    auto c = std::make_unique<Control>();
+    c->slider = std::make_unique<juce::Slider> (juce::Slider::LinearVertical, juce::Slider::NoTextBox);
+    c->label.setText (text, juce::dontSendNotification);
+    c->label.setJustificationType (juce::Justification::centred);
+    c->label.setFont (juce::Font (11.0f));
     addAndMakeVisible (*c->slider);
     addAndMakeVisible (c->label);
     c->sliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc.apvts, paramId, *c->slider);
@@ -151,26 +100,10 @@ JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addCombo 
     }
     c->label.setText (text, juce::dontSendNotification);
     c->label.setJustificationType (juce::Justification::centred);
-    c->label.setFont (juce::Font (10.5f));
+    c->label.setFont (juce::Font (11.0f));
     addAndMakeVisible (*c->combo);
     addAndMakeVisible (c->label);
     c->comboAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc.apvts, paramId, *c->combo);
-    sec.controls.push_back (c.get());
-    allControls.push_back (std::move (c));
-    return *allControls.back();
-}
-
-JunoCloneAudioProcessorEditor::Control& JunoCloneAudioProcessorEditor::addToggle (Section& sec, const juce::String& paramId, const juce::String& text)
-{
-    auto c = std::make_unique<Control>();
-    c->toggle = std::make_unique<juce::TextButton> (text);
-    c->toggle->setClickingTogglesState (true);
-    c->label.setText (text, juce::dontSendNotification);
-    c->label.setJustificationType (juce::Justification::centred);
-    c->label.setFont (juce::Font (10.5f));
-    addAndMakeVisible (*c->toggle);
-    addAndMakeVisible (c->label);
-    c->buttonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (proc.apvts, paramId, *c->toggle);
     sec.controls.push_back (c.get());
     allControls.push_back (std::move (c));
     return *allControls.back();
@@ -181,28 +114,27 @@ void JunoCloneAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (lnf.panelColour);
     g.setColour (juce::Colours::white);
     g.setFont (juce::Font (22.0f, juce::Font::bold));
-    g.drawText ("RetroPoly-80", getLocalBounds().removeFromTop (36).reduced (12, 0), juce::Justification::centredLeft);
-
-    g.setColour (juce::Colours::white.withAlpha (0.6f));
-    g.setFont (juce::Font (12.0f));
-    g.drawText ("Voices", juce::Rectangle<int> (getWidth() - 160, 10, 60, 16), juce::Justification::centredRight);
+    g.drawText ("RetroPoly-80", getLocalBounds().removeFromTop (34).reduced (10, 0), juce::Justification::centredLeft);
 }
 
-void JunoCloneAudioProcessorEditor::layoutRow (const std::vector<Section*>& rowSections, juce::Rectangle<int> rowBounds)
+void JunoCloneAudioProcessorEditor::resized()
 {
-    if (rowSections.empty()) return;
-    int sectionWidth = rowBounds.getWidth() / (int) rowSections.size();
-    int x = rowBounds.getX();
+    auto area = getLocalBounds();
+    area.removeFromTop (34); // Platz fuer Titel
+    presetBar.setBounds (area.removeFromTop (32).reduced (200, 0));
+    area.reduce (10, 10);
 
-    for (auto* secPtr : rowSections)
+    int sectionWidth = area.getWidth() / (int) sections.size();
+    int x = area.getX();
+
+    for (auto& secPtr : sections)
     {
         auto& sec = *secPtr;
-        auto secBounds = juce::Rectangle<int> (x, rowBounds.getY(), sectionWidth - 6, rowBounds.getHeight());
+        auto secBounds = juce::Rectangle<int> (x, area.getY(), sectionWidth - 8, area.getHeight());
         sec.group.setBounds (secBounds);
 
-        auto inner = secBounds.reduced (8, 22);
-        int n = juce::jmax (1, (int) sec.controls.size());
-        int controlW = inner.getWidth() / n;
+        auto inner = secBounds.reduced (10, 22);
+        int controlW = inner.getWidth() / juce::jmax (1, (int) sec.controls.size());
 
         int cx = inner.getX();
         for (auto* ctrl : sec.controls)
@@ -212,10 +144,6 @@ void JunoCloneAudioProcessorEditor::layoutRow (const std::vector<Section*>& rowS
             {
                 ctrl->combo->setBounds (cBounds.removeFromTop (24).withSizeKeepingCentre (controlW - 8, 22));
             }
-            else if (ctrl->toggle != nullptr)
-            {
-                ctrl->toggle->setBounds (cBounds.withSizeKeepingCentre (controlW - 8, 26));
-            }
             else
             {
                 ctrl->slider->setBounds (cBounds);
@@ -223,32 +151,7 @@ void JunoCloneAudioProcessorEditor::layoutRow (const std::vector<Section*>& rowS
             ctrl->label.setBounds (cx, inner.getBottom() - 14, controlW - 4, 14);
             cx += controlW;
         }
+
         x += sectionWidth;
     }
-}
-
-void JunoCloneAudioProcessorEditor::resized()
-{
-    saveOverlay.setBounds (getLocalBounds());
-
-    auto area = getLocalBounds();
-    area.removeFromTop (36);
-
-    auto topBar = area.removeFromTop (32);
-    voiceLedBar.setBounds (topBar.removeFromRight (160).reduced (4));
-    presetBar.setBounds (topBar.reduced (200, 0));
-
-    area.reduce (8, 8);
-
-    std::vector<Section*> row0, row1;
-    for (auto& s : sections)
-        (s->row == 0 ? row0 : row1).push_back (s.get());
-
-    int rowHeight = area.getHeight() / 2;
-    auto row0Bounds = area.removeFromTop (rowHeight - 4);
-    area.removeFromTop (8);
-    auto row1Bounds = area;
-
-    layoutRow (row0, row0Bounds);
-    layoutRow (row1, row1Bounds);
 }

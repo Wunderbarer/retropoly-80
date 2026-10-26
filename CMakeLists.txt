@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
-project(RetroPoly80 VERSION 1.2.0)
+project(RetroPoly80 VERSION 1.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# JUCE wird als Unterordner erwartet:  git submodule add https://github.com/juce-framework/JUCE
 add_subdirectory(JUCE)
 
 juce_add_plugin(RetroPoly80
@@ -24,7 +25,10 @@ target_sources(RetroPoly80 PRIVATE
     Source/PluginEditor.cpp
     Source/Presets/PresetManager.cpp
     Source/GUI/PresetBar.cpp
-    Source/GUI/SavePresetOverlay.cpp
+)
+
+juce_add_binary_data(RetroPoly80Presets SOURCES
+    # optional: hier koennten .xml Faktory-Presets als BinaryData eingebunden werden
 )
 
 target_compile_definitions(RetroPoly80 PUBLIC
