@@ -27,10 +27,6 @@ target_sources(RetroPoly80 PRIVATE
     Source/GUI/PresetBar.cpp
 )
 
-juce_add_binary_data(RetroPoly80Presets SOURCES
-    # optional: hier koennten .xml Faktory-Presets als BinaryData eingebunden werden
-)
-
 target_compile_definitions(RetroPoly80 PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
