@@ -159,11 +159,8 @@ void JunoCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     // --- Fix: korrekte Oversampling-API verwenden ---
     // juce::dsp::Oversampling kennt keine Methode "getOversampledBuffer()".
-    // Richtig ist: processSamplesUp() liefert einen AudioBlock, der auf den
-    // internen (hochgerechneten) Arbeitspuffer zeigt. Da "buffer" an dieser
-    // Stelle noch leer ist (der Klang wird gleich erst vom Synth erzeugt),
-    // dient der Aufruf hier nur dazu, einen korrekt dimensionierten
-    // Scratch-Block in der (ggf. erhoehten) internen Samplerate zu bekommen.
+    // Richtig: processSamplesUp() liefert einen AudioBlock auf den internen
+    // (hochgerechneten) Arbeitspuffer.
     auto osBlock = oversampler->processSamplesUp (block);
     auto numOS = (int) osBlock.getNumSamples();
 

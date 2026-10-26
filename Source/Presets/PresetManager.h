@@ -52,6 +52,12 @@ public:
 
     juce::String getCurrentPresetName() const { return currentName; }
 
+    // --- Schritt: Zufalls-Patch-Generator ---
+    // Erzeugt einen neuen, musikalisch sinnvollen Zufallsklang (Details siehe
+    // Implementierung in PresetManager.cpp). Nach dem Aufruf zeigt die
+    // Preset-Leiste "Random" als aktuellen, noch nicht gespeicherten Namen an.
+    void randomize();
+
     void loadNext()
     {
         if (presets.isEmpty()) return;

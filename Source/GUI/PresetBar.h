@@ -17,6 +17,8 @@ private:
     juce::TextButton prevButton { "<" };
     juce::TextButton nextButton { ">" };
     juce::TextButton saveButton { "Save As..." };
+    // --- Schritt: Zufalls-Patch-Generator (GUI-Anbindung) ---
+    juce::TextButton randomButton { "Random" };
     juce::Label nameLabel;
 
     void showSaveDialog();

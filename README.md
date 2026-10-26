@@ -36,6 +36,13 @@ und als **eigenstaendige Standalone-Anwendung**.
    Akzentfarbe, handgezeichnete Drehpotis (mit Skalenstrichen + Zeiger) und
    Schieberegler (Schlitz + Kappe) — die gleichen zwei Bedienelement-Typen wie
    beim Original, aber eigenstaendiges Design ohne Markenlogo/-namen.
+9. **Zufalls-Patch-Generator ("Random")** — `PresetManager::randomize()` +
+   Button in der Preset-Leiste: wuerfelt einen kompletten neuen Klang, wobei
+   jeder Parameter NICHT gleichverteilt, sondern innerhalb eng gefasster,
+   musikalisch sinnvoller Wertebereiche gewuerfelt wird (DCO nie komplett
+   stumm, Filter-Cutoff auf einer gehoerrichtigen Skala, Huellkurvenzeiten
+   eher kurz-mittel, Resonanz unterhalb der Selbstoszillation usw.) — das
+   Ergebnis ist praktisch immer sofort spielbar.
 
 ## Projektstruktur
 
