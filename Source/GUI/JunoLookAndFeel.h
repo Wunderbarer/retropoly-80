@@ -1,13 +1,6 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 
-// --- Schritt: Optik wie das Original-Bedienfeld ---
-// Eigenstaendiges, an das Original angelehntes Design: dunkles Metallic-Chassis,
-// orange/rote Akzentfarbe, Drehpotis MIT Zeigerlinie + Skalenstrichen und
-// Schieberegler als laengliche "Kappen" auf einem Schlitz - exakt die beiden
-// Bedienelement-Typen, die auch die Original-Hardware verwendet. Kein Logo,
-// kein Markenname, kein 1:1 kopiertes Bild - nur die Bedienelement-Typen und
-// das allgemeine Farbschema sind angelehnt.
 class JunoLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
@@ -15,15 +8,21 @@ public:
     {
         setColour (juce::Slider::thumbColourId, accentColour);
         setColour (juce::Slider::trackColourId, juce::Colours::black);
-        setColour (juce::Slider::backgroundColourId, panelColour.darker (0.2f));
+        setColour (juce::Slider::backgroundColourId, panelColour.darker (0.3f));
         setColour (juce::ResizableWindow::backgroundColourId, panelColour);
-        setColour (juce::Label::textColourId, juce::Colours::white.withAlpha (0.9f));
+        setColour (juce::Label::textColourId, juce::Colours::white.withAlpha (0.92f));
         setColour (juce::GroupComponent::textColourId, accentColour);
-        setColour (juce::GroupComponent::outlineColourId, juce::Colours::grey.withAlpha (0.5f));
-        setColour (juce::ComboBox::backgroundColourId, juce::Colours::black);
-        setColour (juce::ComboBox::outlineColourId, juce::Colours::grey);
-        setColour (juce::TextButton::buttonColourId, juce::Colours::black);
-        setColour (juce::TextButton::textColourOffId, accentColour);
+        setColour (juce::GroupComponent::outlineColourId, juce::Colours::white.withAlpha (0.25f));
+        setColour (juce::ComboBox::backgroundColourId, juce::Colour (0xff0e1a2c));
+        setColour (juce::ComboBox::outlineColourId, juce::Colours::white.withAlpha (0.3f));
+        setColour (juce::ComboBox::textColourId, juce::Colours::white);
+        setColour (juce::TextButton::buttonColourId, juce::Colour (0xff0e1a2c));
+        setColour (juce::TextButton::buttonOnColourId, accentColour.darker (0.1f));
+        setColour (juce::TextButton::textColourOffId, juce::Colours::white.withAlpha (0.85f));
+        setColour (juce::TextButton::textColourOnId, juce::Colours::black);
+        setColour (juce::TextEditor::backgroundColourId, juce::Colour (0xff0e1a2c));
+        setColour (juce::TextEditor::textColourId, juce::Colours::white);
+        setColour (juce::TextEditor::outlineColourId, juce::Colours::white.withAlpha (0.3f));
     }
 
     void drawRotarySlider (juce::Graphics& g, int x, int y, int w, int h,
@@ -34,78 +33,82 @@ public:
         auto centre = bounds.getCentre();
         auto angle = startAngle + pos * (endAngle - startAngle);
 
-        // Poti-Koerper mit leichtem Radial-Verlauf, wirkt wie gebuerstetes Metall/Kunststoff
-        juce::ColourGradient grad (juce::Colour (0xff4a4a4e), centre.x, centre.y - radius,
-                                    juce::Colour (0xff1c1c1e), centre.x, centre.y + radius, false);
-        g.setGradientFill (grad);
+        g.setColour (juce::Colour (0xff10151c));
         g.fillEllipse (bounds);
-        g.setColour (juce::Colours::black);
-        g.drawEllipse (bounds, 1.5f);
 
-        // Skalenstriche wie beim Original (11 Raststriche: min, 9 Zwischenwerte, max)
-        g.setColour (juce::Colours::grey);
+        g.setColour (juce::Colours::white.withAlpha (0.7f));
         for (int i = 0; i <= 10; ++i)
         {
             float a = startAngle + (endAngle - startAngle) * (i / 10.0f);
-            auto p1 = centre.getPointOnCircumference (radius + 2.0f, a - juce::MathConstants<float>::halfPi);
-            auto p2 = centre.getPointOnCircumference (radius + 6.0f, a - juce::MathConstants<float>::halfPi);
-            g.drawLine ({ p1, p2 }, 1.0f);
+            auto p1 = centre.getPointOnCircumference (radius + 1.0f, a - juce::MathConstants<float>::halfPi);
+            auto p2 = centre.getPointOnCircumference (radius - 2.0f, a - juce::MathConstants<float>::halfPi);
+            g.drawLine ({ p1, p2 }, 1.2f);
         }
 
-        // Zeiger
-        juce::Point<float> tip (centre.x + radius * 0.75f * std::cos (angle - juce::MathConstants<float>::halfPi),
-                                 centre.y + radius * 0.75f * std::sin (angle - juce::MathConstants<float>::halfPi));
-        g.setColour (accentColour);
-        g.drawLine ({ centre, tip }, 2.5f);
-        g.fillEllipse (juce::Rectangle<float> (5.0f, 5.0f).withCentre (centre));
+        auto capBounds = bounds.reduced (radius * 0.22f);
+        juce::ColourGradient grad (juce::Colour (0xfffafaf6), centre.x, centre.y - radius,
+                                    juce::Colour (0xffd6d6cd), centre.x, centre.y + radius, false);
+        g.setGradientFill (grad);
+        g.fillEllipse (capBounds);
+        g.setColour (juce::Colours::black.withAlpha (0.35f));
+        g.drawEllipse (capBounds, 1.0f);
+
+        auto capRadius = capBounds.getWidth() * 0.5f;
+        juce::Point<float> tip (centre.x + capRadius * 0.78f * std::cos (angle - juce::MathConstants<float>::halfPi),
+                                 centre.y + capRadius * 0.78f * std::sin (angle - juce::MathConstants<float>::halfPi));
+        g.setColour (juce::Colours::black);
+        g.drawLine ({ centre, tip }, 2.8f);
     }
 
-    void drawLinearSlider (juce::Graphics& g, int x, int y, int w, int h,
-                            float sliderPos, float, float, const juce::Slider::SliderStyle style,
-                            juce::Slider&) override
+    void drawToggleButton (juce::Graphics& g, juce::ToggleButton& button,
+                            bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
-        // Schlitz
-        g.setColour (juce::Colours::black);
-        if (style == juce::Slider::LinearVertical)
-            g.fillRoundedRectangle ((float) (x + w / 2 - 3), (float) y, 6.0f, (float) h, 2.0f);
-        else
-            g.fillRoundedRectangle ((float) x, (float) (y + h / 2 - 3), (float) w, 6.0f, 2.0f);
+        auto bounds = button.getLocalBounds().toFloat().reduced (1.0f);
+        g.setColour (juce::Colour (0xff0e1a2c));
+        g.fillRoundedRectangle (bounds, 3.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.3f));
+        g.drawRoundedRectangle (bounds, 3.0f, 1.0f);
 
-        g.setColour (juce::Colours::grey.withAlpha (0.4f));
-        if (style == juce::Slider::LinearVertical)
-            g.drawRoundedRectangle ((float) (x + w / 2 - 3), (float) y, 6.0f, (float) h, 2.0f, 1.0f);
-        else
-            g.drawRoundedRectangle ((float) x, (float) (y + h / 2 - 3), (float) w, 6.0f, 2.0f, 1.0f);
+        auto led = juce::Rectangle<float> (bounds.getX() + 6.0f, bounds.getCentreY() - 4.0f, 8.0f, 8.0f);
+        g.setColour (button.getToggleState() ? accentColour : juce::Colours::black.withAlpha (0.6f));
+        g.fillEllipse (led);
 
-        // Laengliche Reglerkappe, wie bei den original Schiebereglern
-        g.setColour (accentColour);
-        if (style == juce::Slider::LinearVertical)
-        {
-            auto capRect = juce::Rectangle<float> ((float) x + 2.0f, sliderPos - 7.0f, (float) w - 4.0f, 14.0f);
-            g.fillRoundedRectangle (capRect, 3.0f);
-            g.setColour (juce::Colours::black.withAlpha (0.6f));
-            g.drawLine (capRect.getX() + 3, capRect.getCentreY(), capRect.getRight() - 3, capRect.getCentreY(), 1.5f);
-        }
-        else
-        {
-            auto capRect = juce::Rectangle<float> (sliderPos - 7.0f, (float) y + 2.0f, 14.0f, (float) h - 4.0f);
-            g.fillRoundedRectangle (capRect, 3.0f);
-        }
+        g.setColour (juce::Colours::white);
+        g.setFont (juce::Font (12.0f));
+        g.drawText (button.getButtonText(), bounds.withTrimmedLeft (20.0f), juce::Justification::centredLeft);
+        juce::ignoreUnused (shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+    }
+
+    void drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour&,
+                                bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
+    {
+        auto bounds = button.getLocalBounds().toFloat().reduced (1.0f);
+        auto baseColour = button.getToggleState()
+                         ? accentColour
+                         : juce::Colour (0xff0e1a2c).brighter (shouldDrawButtonAsHighlighted ? 0.15f : 0.0f);
+        if (shouldDrawButtonAsDown) baseColour = baseColour.darker (0.2f);
+
+        g.setColour (baseColour);
+        g.fillRoundedRectangle (bounds, 4.0f);
+        g.setColour (juce::Colours::white.withAlpha (0.3f));
+        g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
     }
 
     void drawGroupComponentOutline (juce::Graphics& g, int w, int h, const juce::String& text,
                                      const juce::Justification&, juce::GroupComponent&) override
     {
         auto bounds = juce::Rectangle<float> (0, 0, (float) w, (float) h).reduced (2.0f);
+        g.setColour (juce::Colour (0xff17283f));
+        g.fillRoundedRectangle (bounds, 5.0f);
         g.setColour (findColour (juce::GroupComponent::outlineColourId));
-        g.drawRoundedRectangle (bounds, 4.0f, 1.0f);
+        g.drawRoundedRectangle (bounds, 5.0f, 1.0f);
 
         g.setColour (accentColour);
-        g.setFont (juce::Font (13.0f, juce::Font::bold));
+        g.setFont (juce::Font (12.5f, juce::Font::bold));
         g.drawText (text.toUpperCase(), bounds.removeFromTop (16.0f).reduced (6.0f, 0.0f),
                     juce::Justification::centredLeft);
     }
 
-    juce::Colour panelColour  { 0xff26262a };
-    juce::Colour accentColour { 0xffff7a1a };
+    juce::Colour panelColour  { 0xff1c3253 };
+    juce::Colour accentColour { 0xfff4a93c };
 };
